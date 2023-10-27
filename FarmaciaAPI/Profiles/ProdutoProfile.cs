@@ -10,6 +10,5 @@ public class ProdutoProfile : Profile
 	{
 		CreateMap<ProdutoDTO, Produtos>();
 		CreateMap<Produtos, ReadProdutoDTO>().ForMember(e => e.Imagens, opt => opt.MapFrom(p => p.Imagens));
-		
 	}
 }

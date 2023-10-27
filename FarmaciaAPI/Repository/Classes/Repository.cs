@@ -10,18 +10,18 @@ public class Repository<T> : IRepository<T> where T : class
 {
     protected FContext _context;
     protected BlobServiceClient _blobServiceClient;
-    
+
     public Repository(FContext context, BlobServiceClient blobService)
     {
-		_context = context;
+        _context = context;
         _blobServiceClient = blobService;
     }
 
-   
-    public IQueryable<T> Get(int skip, int take) 
-	{
-		return _context.Set<T>().Skip(skip).Take(take);
-	}
+
+    public IQueryable<T> Get(int skip, int take)
+    {
+        return _context.Set<T>().AsNoTracking().Skip(skip).Take(take);
+    }
 
     public async Task<T> BuscaPorID(Expression<Func<T, bool>> expression)
     {

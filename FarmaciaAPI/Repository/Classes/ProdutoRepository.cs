@@ -14,7 +14,7 @@ public class ProdutoRepository : Repository<Produtos>, IProdutoRepository
     public ProdutoRepository(FContext context, BlobServiceClient blobService) : base(context, blobService)
     {
         _blobService = blobService;
-        _containerInstance = _blobService.GetBlobContainerClient("aztech");
+        _containerInstance = _blobService.GetBlobContainerClient("apifarmablob");
     }
 
     public async Task ApagaImagens(Imagem imagem)

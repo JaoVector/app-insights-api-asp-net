@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using FarmaciaAPI.DTOS;
+using FarmaciaAPI.Middlewares.Exceptions;
 using FarmaciaAPI.Models;
 using FarmaciaAPI.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Data;
 
 namespace FarmaciaAPI.Controllers;
 
@@ -32,7 +34,7 @@ public class ImagemController : ControllerBase
        
         var produto = _uof.ProdutoRepository.BuscaPorID(p => p.ProdutoId == imagemDTO.ProdutoId);
 
-        if (produto == null) return NotFound($"Não existe produto com o ID: {imagemDTO.ProdutoId}");
+        if (produto == null) throw new NotFoundException($"Não existe produto com o ID: {imagemDTO.ProdutoId}");
 
         var img = await _uof.ImagemRepository.UploadImage(imagemDTO);
 
@@ -49,35 +51,43 @@ public class ImagemController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<ReadImagemIdDTO>> BuscaPorID(int id) 
+    public async Task<ActionResult<ReadImagemDTO>> BuscaPorID(int id) 
     {
         var imagem = await _uof.ImagemRepository.BuscaPorID(img => img.ImageId == id);
 
-        if (imagem == null) return NotFound("Imagem Não Encontrada");
+        if (imagem == null) throw new NotFoundException("Imagem Não Encontrada");
 
-        ReadImagemIdDTO readImagemId = _mapper.Map<ReadImagemIdDTO>(imagem);
+        ReadImagemDTO readImagemId = _mapper.Map<ReadImagemDTO>(imagem);
 
         return Ok(readImagemId);
     }
 
 
     [HttpDelete(nameof(DeletaImagemPelaUrl))]
-    public async Task<ActionResult<ReadImagemIdDTO>> DeletaImagemPelaUrl([FromQuery] string url) 
+    public async Task<ActionResult<ReadImagemDTO>> DeletaImagemPelaUrl([FromQuery] string url) 
     {
         Imagem imagem = await _uof.ImagemRepository.BuscaPorID(img => img.ImagemURL == url);
 
-        if (imagem == null) return NotFound("Imagem Não encontrada");
-
+        if (imagem == null) throw new NotFoundException("Imagem Não Encontrada");
+        
         var imgDeletada = await _uof.ImagemRepository.ApagaImagem(imagem);
 
-        if (imgDeletada == null) return NotFound("Url não Encontrada no Blob");
+        if (imgDeletada == null) throw new NotFoundException("Url não Encontrada no Blob");
 
-        _uof.ImagemRepository.Delete(imagem);
-        await _uof.Commit();
-
-        ReadImagemIdDTO readImagem = _mapper.Map<ReadImagemIdDTO>(imagem);
+        try
+        {
+            _uof.ImagemRepository.Delete(imagem);
+            await _uof.Commit();
+        }
+        catch (DBConcurrencyException)
+        {
+            throw;
+        }
+       
+        ReadImagemDTO readImagem = _mapper.Map<ReadImagemDTO>(imagem);
 
         return Ok(readImagem);
     }
 
 }
+

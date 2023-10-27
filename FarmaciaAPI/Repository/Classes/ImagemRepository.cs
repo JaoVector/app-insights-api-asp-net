@@ -12,8 +12,8 @@ public class ImagemRepository : Repository<Imagem>, IImagemRepository
     private readonly BlobContainerClient _containerInstance;
 	public ImagemRepository(FContext context, BlobServiceClient blobService) : base(context, blobService)
 	{
-		_blobService= blobService;
-        _containerInstance = _blobService.GetBlobContainerClient("aztech");
+		_blobService = blobService;
+        _containerInstance = _blobService.GetBlobContainerClient("apifarmablob");
     }
 
 
@@ -34,17 +34,4 @@ public class ImagemRepository : Repository<Imagem>, IImagemRepository
 
         return blobInstance.Uri.AbsoluteUri;
     }
-
-
-    /*
-     *  public async Task<string> DeleteImage(string url) 
-    {
-        
-
-        
-
-       
-    } 
-     * 
-     */
 }

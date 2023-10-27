@@ -10,7 +10,6 @@ public class ImagemProfile : Profile
 	{
 		CreateMap<ImagemDTO, Imagem>();
 		CreateMap<Imagem, ReadImagemDTO>();
-		CreateMap<Imagem, ReadImagemIdDTO>();
-        CreateMap<ReadImagemDTO, Imagem>();
-    }
+		CreateMap<ReadImagemDTO, Imagem>();
+	}
 }

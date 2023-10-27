@@ -1,5 +1,6 @@
 using Azure.Storage.Blobs;
 using FarmaciaAPI.Context;
+using FarmaciaAPI.Middlewares;
 using FarmaciaAPI.Repository.Classes;
 using FarmaciaAPI.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -7,9 +8,8 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddDbContext<FContext>(options => options.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("FarmConnection")));
-
 builder.Services.AddScoped(_ =>
 {
     return new BlobServiceClient(builder.Configuration.GetConnectionString("ConnectionStringBlob"));
@@ -32,6 +32,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware(typeof(MappingErrorMiddleware));
 
 app.UseHttpsRedirection();
 
